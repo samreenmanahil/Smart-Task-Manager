@@ -1,45 +1,46 @@
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { Auth, createUserWithEmailAndPassword } from '@angular/fire/auth';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { RouterModule } from '@angular/router';
+import { Auth, createUserWithEmailAndPassword, sendEmailVerification, updateProfile } from '@angular/fire/auth';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-register',
   standalone: true,
   templateUrl: './register.component.html',
-  styleUrls: ['./register.component.css'],
- imports: [CommonModule, FormsModule, RouterModule]
-
+  imports: [CommonModule, ReactiveFormsModule],
 })
 export class RegisterComponent {
-  email: string = '';
-  password: string = '';
-  confirmPassword: string = '';
+  form: FormGroup;
   message: string = '';
   error: string = '';
 
-  constructor(private auth: Auth, private router: Router) {}
+  constructor(private fb: FormBuilder, private router: Router, private auth: Auth) {
+    this.form = this.fb.group({
+      name: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', Validators.required],
+      confirmPassword: ['', Validators.required],
+    });
+  }
 
-  register() {
-    this.error = '';
-    this.message = '';
+  async register() {
+    const { name, email, password, confirmPassword } = this.form.value;
 
-    if (this.password !== this.confirmPassword) {
-      this.error = 'Passwords do not match';
+    if (password !== confirmPassword) {
+      this.error = 'Passwords do not match.';
       return;
     }
 
-    createUserWithEmailAndPassword(this.auth, this.email, this.password)
-      .then(userCredential => {
-        console.log('User registered!', userCredential.user);
-        this.message = 'Account created successfully!';
-        this.router.navigate(['/login']);
-      })
-      .catch(error => {
-        console.error('Registration error:', error);
-        this.error = error.message;
-      });
+    try {
+      const userCredential = await createUserWithEmailAndPassword(this.auth, email, password);
+      await updateProfile(userCredential.user, { displayName: name });
+      await sendEmailVerification(userCredential.user);
+
+      this.message = 'Verification email sent. Please check your inbox.';
+      this.router.navigate(['/verify-email']);
+    } catch (err: any) {
+      this.error = err.message;
+    }
   }
 }

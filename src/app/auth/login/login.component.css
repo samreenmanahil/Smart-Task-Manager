@@ -1,46 +1,6 @@
-.auth-container {
-  max-width: 400px;
-  margin: 40px auto;
-  padding: 30px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  font-family: sans-serif;
-}
-
-input {
-  padding: 10px;
-  font-size: 16px;
-  border-radius: 4px;
-  border: 1px solid #ccc;
-}
-
-button {
-  padding: 10px;
-  font-size: 16px;
-  background-color: #1976d2;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-button:disabled {
-  background-color: #ccc;
-}
-
-.success {
-  color: green;
-}
-
 .error {
   color: red;
 }
-
-a {
-  text-align: center;
-  color: #1976d2;
-  text-decoration: none;
+.success {
+  color: green;
 }

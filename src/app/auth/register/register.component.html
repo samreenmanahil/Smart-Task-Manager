@@ -1,38 +1,19 @@
-<div class="auth-container">
-  <h2>Register</h2>
+<h2>Register</h2>
 
-  <form (ngSubmit)="register()" #registerForm="ngForm">
-    <input
-      type="email"
-      placeholder="Email"
-      [(ngModel)]="email"
-      name="email"
-      required
-    />
-    <input
-      type="password"
-      placeholder="Password"
-      [(ngModel)]="password"
-      name="password"
-      required
-    />
-    <input
-      type="password"
-      placeholder="Confirm Password"
-      [(ngModel)]="confirmPassword"
-      name="confirmPassword"
-      required
-    />
+<form [formGroup]="form" (ngSubmit)="register()">
+  <input type="text" placeholder="Name" formControlName="name" />
+  <input type="email" placeholder="Email" formControlName="email" />
+  <input type="password" placeholder="Password" formControlName="password" />
+  <input type="password" placeholder="Confirm Password" formControlName="confirmPassword" />
 
-    <button type="submit" [disabled]="registerForm.invalid">Register</button>
-  </form>
+  <!-- Inline error for password mismatch -->
+  <div *ngIf="form.value.password !== form.value.confirmPassword && form.touched">
+    <p class="error">Passwords do not match</p>
+  </div>
 
-  <p *ngIf="message" class="success">{{ message }}</p>
-  <p *ngIf="error" class="error">{{ error }}</p>
+  <button type="submit">Register</button>
+</form>
 
-  <a routerLink="/login">Already have an account? Login</a>
-</div>
-
-
-
-
+<!-- Feedback messages -->
+<p *ngIf="error" class="error">{{ error }}</p>
+<p *ngIf="message" class="success">{{ message }}</p>

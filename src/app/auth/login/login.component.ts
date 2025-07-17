@@ -1,35 +1,46 @@
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { Auth, signInWithEmailAndPassword } from '@angular/fire/auth';
-import { RouterModule } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router'; // ✅ Add this line
 
 @Component({
   selector: 'app-login',
   standalone: true,
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css'],
-  imports: [CommonModule, FormsModule, RouterModule]
+  imports: [CommonModule, ReactiveFormsModule, RouterModule], // ✅ Add RouterModule here
 })
 export class LoginComponent {
-  email = '';
-  password = '';
-  error = '';
-  message = '';
+  form: FormGroup;
+  error: string = '';
+  message: string = '';
 
-  constructor(private auth: Auth) {}
+  constructor(private fb: FormBuilder, private router: Router, private auth: Auth) {
+    this.form = this.fb.group({
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', Validators.required]
+    });
+  }
 
-  login() {
-    signInWithEmailAndPassword(this.auth, this.email, this.password)
-      .then(userCredential => {
-        this.message = '✅ Login successful!';
+  async login() {
+    const { email, password } = this.form.value;
+
+    try {
+      const userCredential = await signInWithEmailAndPassword(this.auth, email, password);
+
+      if (userCredential.user.emailVerified) {
+        this.message = 'Login successful!';
         this.error = '';
-        console.log('Logged in user:', userCredential.user);
-      })
-      .catch(err => {
-        this.error = err.message;
+        this.router.navigate(['/dashboard']);
+      } else {
+        this.error = 'Please verify your email before logging in.';
         this.message = '';
-        console.error('Login error:', err);
-      });
+        this.router.navigate(['/verify-email']);
+      }
+    } catch (err: any) {
+      this.message = '';
+      this.error = err.message;
+    }
   }
 }

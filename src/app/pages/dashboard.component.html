@@ -1,0 +1,26 @@
+<mat-toolbar color="primary">
+  <span>Smart Task Manager</span>
+  <span class="spacer"></span>
+  <span>{{ userEmail }}</span>
+  <button mat-button color="warn" (click)="logout()">Logout</button>
+</mat-toolbar>
+
+<div class="dashboard-container">
+  <h2>Welcome, {{ userDisplayName || 'User' }}!</h2>
+  <p *ngIf="!emailVerified" class="warning">⚠️ Your email is not verified.</p>
+
+  <button mat-raised-button color="accent" (click)="openAddTaskDialog()">
+    ➕ Add Task
+  </button>
+
+  <div *ngIf="tasks.length === 0" class="no-tasks">
+    <p>No tasks added yet. Use the button above to add one.</p>
+  </div>
+
+  <div *ngFor="let task of tasks" class="task-card">
+    <mat-card>
+      <h3>{{ task.title }}</h3>
+      <p>Status: {{ task.status }}</p>
+    </mat-card>
+  </div>
+</div>
